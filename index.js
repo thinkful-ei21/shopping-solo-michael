@@ -14,13 +14,17 @@ const STORE = {
 function generateItemElement(item, itemIndex, template) {
   return `
     <li class="js-item-index-element ${item.class}" data-item-index="${itemIndex}">
-      <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}">${item.name}</span>
-      <div class="shopping-item-controls">
+      <span class="shopping-item js-shopping-item ${item.checked ? 'shopping-item__checked' : ''}" >${item.name}</span>
+      <input class="shopping-item-edit-input js-shopping-item-edit-input" type="text" value="${item.name}"></input>
+      <div class="shopping-item-controls js-shopping-items-controls">
         <button class="shopping-item-toggle js-item-toggle">
             <span class="button-label">check</span>
         </button>
         <button class="shopping-item-delete js-item-delete">
             <span class="button-label">delete</span>
+        </button>
+        <button class="shopping-item-edit js-item-edit">
+            <span class="button-label">edit</span>
         </button>
       </div>
     </li>`;
@@ -78,12 +82,9 @@ function searchForItem(searchItem) {
       found = match;
     }
   }
-  //console.log(found);
   STORE.displayItems = STORE.items.filter(function(itm) {
-    console.log(itm);
     return itm.name === searchItem;
   });
-  console.log(STORE.displayItems);
 }
 
 function handleSearchItemSubmit() {
@@ -145,6 +146,60 @@ function handleCheckedItemView() {
 }
 
 
+function handleEditItemClicked() {
+  console.log('`handleEditItemClicked` ran');
+  $('.js-shopping-list').on('click', '.js-item-edit', event => {
+    const itemIndex = getItemIndexFromElement(event.currentTarget);
+    const listIndex = $(`li[data-item-index='${itemIndex}']`);
+    let buttonText = $(listIndex).find('.js-item-edit .button-label');
+    //console.log(`Button text: ${buttonText.text()}` );
+    if (buttonText.text() === 'edit') {
+      editListItem(itemIndex);
+      buttonText.text('save');
+    } else if (buttonText.text() === 'save'){
+      saveListItem(itemIndex, listIndex);
+      buttonText.text('edit');
+    }
+  });
+}
+
+
+function editListItem(itemIndex) {
+  console.log('`editListItemClicked` ran');
+  console.log('Editing list item at index ' + itemIndex);
+  const listIndex = $(`li[data-item-index='${itemIndex}']`);
+  console.log(listIndex);
+
+  
+  //let newName = ($(listIndex).find('.js-shopping-item-edit-input').val());
+
+  // console.log('new name: ' + newName);
+  //span js-shopping-item: hidden
+  $(listIndex).find('.js-shopping-item').hide();
+  // input shopping-item-edit show
+  $(listIndex).find('.js-shopping-item-edit-input').show();
+
+  return listIndex;
+}
+
+function saveListItem(itemIndex, listIndex) {
+  console.log(itemIndex);
+  console.log('`saveListItemClicked` ran');
+  let newName = $(itemIndex).find('.js-shopping-item-edit-input').val();
+  console.log('Saving new name: '+ newName + ' for list item at index ' + itemIndex);
+  // input shopping-item-edit hide
+  $('.js-shopping-item-edit-input').hide();
+  //span js-shopping-item show
+  $('.js-shopping-item').show();
+
+  //console.log('new name: ' + newName);
+  // update STORE.name using Object.assign()
+  // ... something like ...
+  // return STORE.items[itemIndex].assign(STORE.items[itemIndex].name, newName);
+
+}
+
+
 function removeListItem(itemIndex) {
   console.log('Removing item at index ' + itemIndex);
   STORE.items.splice(itemIndex, 1);
@@ -182,6 +237,7 @@ function handleDeleteItemClicked() {
   });
 }
 
+
 // this function will be our callback when the page loads. it's responsible for
 // initially rendering the shopping list, and activating our individual functions
 // that handle new item submission and user clicks on the "check" and "delete" buttons
@@ -192,6 +248,7 @@ function handleShoppingList() {
   handleSearchItemSubmit();
   handleItemCheckClicked();
   handleCheckedItemView();
+  handleEditItemClicked();
   handleDeleteItemClicked();
 }
 

@@ -53,3 +53,12 @@
   .shopping-item__checked {
     text-decoration: line-through;
   }
+
+  .shopping-item-edit-input, input[type=text]:focus {
+    background-color: rgba(252, 244, 170, 0.76);
+    margin-bottom: 15px;
+  }
+
+  .shopping-item-edit-input {
+    display: none;
+  }
